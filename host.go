@@ -265,10 +265,6 @@ func (h *Host) StopDocker() error {
 func (h *Host) ConfigureAuth() error {
 	d := h.Driver
 
-	if d.DriverName() == "none" {
-		return nil
-	}
-
 	// copy certs to client dir for docker client
 	machineDir := filepath.Join(utils.GetMachineDir(), h.Name)
 	if err := utils.CopyFile(h.CaCertPath, filepath.Join(machineDir, "ca.pem")); err != nil {
@@ -283,6 +279,19 @@ func (h *Host) ConfigureAuth() error {
 	clientKeyPath := filepath.Join(utils.GetMachineCertDir(), "key.pem")
 	if err := utils.CopyFile(clientKeyPath, filepath.Join(machineDir, "key.pem")); err != nil {
 		log.Fatalf("Error copying key.pem to machine dir: %s", err)
+	}
+
+	if d.DriverName() == "none" {
+		serverCertPath := filepath.Join(h.storePath, "server.pem")
+		serverKeyPath := filepath.Join(h.storePath, "server-key.pem")
+		ip, _ := h.Driver.GetIP()
+		if err := utils.GenerateCert([]string{ip},
+			serverCertPath,
+			serverKeyPath, h.CaCertPath,
+			h.PrivateKeyPath, h.Name, 2048); err != nil {
+			return fmt.Errorf("error generating server cert: %s", err)
+		}
+		return nil
 	}
 
 	var (
