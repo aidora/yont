@@ -51,8 +51,7 @@ type Driver struct {
 	SwarmHost        string
 	SwarmDiscovery   string
 	SSHDelay         int
-
-	client Client
+	client           Client
 }
 
 type CreateFlags struct {
@@ -182,9 +181,9 @@ func GetCreateFlags() []cli.Flag {
 			Value: 22,
 		},
 		cli.IntFlag{
-			Name:  "ssh-delay",
+			Name:  "openstack-ssh-delay",
 			Usage: "Delay in seconds before connecting via SSH",
-			Value: 30,
+			Value: 0,
 		},
 	}
 }
@@ -279,7 +278,7 @@ func (d *Driver) SetConfigFromFlags(flags drivers.DriverOptions) error {
 	d.SwarmHost = flags.String("swarm-host")
 	d.SwarmDiscovery = flags.String("swarm-discovery")
 
-	d.SSHDelay = flags.Int("ssh-delay")
+	d.SSHDelay = flags.Int("openstack-ssh-delay")
 
 	return d.checkConfig()
 }
@@ -719,7 +718,7 @@ func (d *Driver) waitForSSHServer() error {
 		return err
 	}
 
-	log.Debugf("Waiting %d second for SSH key to be in-placed", d.SSHDelay)
+	log.Debugf("Waiting %d second(s) for SSH key to be in-placed", d.SSHDelay)
 	time.Sleep(time.Duration(d.SSHDelay) * time.Second)
 
 	log.WithFields(log.Fields{
