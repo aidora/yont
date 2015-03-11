@@ -126,7 +126,7 @@ func (h *Host) Create(name string) error {
 	return nil
 }
 
-func (h *Host) RunSSHCommand(command string) (ssh.Output, error) {
+func (h *Host) _RunSSHCommand(command string) (ssh.Output, error) {
 	var output ssh.Output
 
 	addr, err := h.Driver.GetSSHHostname()

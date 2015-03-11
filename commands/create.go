@@ -16,7 +16,7 @@ import (
 	"github.com/docker/machine/utils"
 )
 
-func cmdCreate(c *cli.Context) {
+func cmdCreate0(c *cli.Context) {
 	var (
 		err error
 	)

@@ -178,7 +178,7 @@ func getDefaultDaemonOpts(driverName string, authOptions auth.AuthOptions) strin
 	)
 }
 
-func configureSwarm(p Provisioner, swarmOptions swarm.SwarmOptions) error {
+func configureSwarm0(p Provisioner, swarmOptions swarm.SwarmOptions) error {
 	if !swarmOptions.IsSwarm {
 		return nil
 	}

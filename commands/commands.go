@@ -12,6 +12,7 @@ import (
 	"github.com/skarademir/naturalsort"
 
 	"github.com/docker/machine/drivers"
+	_ "github.com/docker/machine/drivers/aiyara"
 	_ "github.com/docker/machine/drivers/amazonec2"
 	_ "github.com/docker/machine/drivers/azure"
 	_ "github.com/docker/machine/drivers/digitalocean"
@@ -212,7 +213,7 @@ var Commands = []cli.Command{
 	{
 		Flags: append(
 			drivers.GetCreateFlags(),
-			sharedCreateFlags...,
+			extSharedCreateFlags...,
 		),
 		Name:   "create",
 		Usage:  "Create a machine",

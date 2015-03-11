@@ -173,7 +173,7 @@ type DriverOptions interface {
 	Bool(key string) bool
 }
 
-func RunSSHCommandFromDriver(d Driver, args string) (ssh.Output, error) {
+func _RunSSHCommandFromDriver(d Driver, args string) (ssh.Output, error) {
 	var output ssh.Output
 
 	host, err := d.GetSSHHostname()
