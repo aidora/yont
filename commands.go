@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -488,7 +489,11 @@ func cmdEnv(c *cli.Context) {
 		case "fish":
 			fmt.Printf("set -e DOCKER_TLS_VERIFY;\nset -e DOCKER_CERT_PATH;\nset -e DOCKER_HOST;\n")
 		default:
-			fmt.Println("unset DOCKER_TLS_VERIFY DOCKER_CERT_PATH DOCKER_HOST")
+			if userShell == "." && runtime.GOOS == "windows" {
+				fmt.Println("set DOCKER_TLS_VERIFY=\nset DOCKER_CERT_PATH=\nset DOCKER_HOST=\n")
+			} else {
+				fmt.Println("unset DOCKER_TLS_VERIFY DOCKER_CERT_PATH DOCKER_HOST")
+			}
 		}
 		return
 	}
@@ -526,8 +531,13 @@ func cmdEnv(c *cli.Context) {
 		fmt.Printf("set -x DOCKER_TLS_VERIFY 1;\nset -x DOCKER_CERT_PATH %s;\nset -x DOCKER_HOST %s;\n",
 			cfg.machineDir, dockerHost)
 	default:
-		fmt.Printf("export DOCKER_TLS_VERIFY=1\nexport DOCKER_CERT_PATH=%s\nexport DOCKER_HOST=%s\n",
-			cfg.machineDir, dockerHost)
+		if userShell == "." && runtime.GOOS == "windows" {
+			fmt.Printf("set DOCKER_TLS_VERIFY=1\nset DOCKER_CERT_PATH=%s\nset DOCKER_HOST=%s\n",
+				cfg.machineDir, dockerHost)
+		} else {
+			fmt.Printf("export DOCKER_TLS_VERIFY=1\nexport DOCKER_CERT_PATH=%s\nexport DOCKER_HOST=%s\n",
+				cfg.machineDir, dockerHost)
+		}
 	}
 }
 
