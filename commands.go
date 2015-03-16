@@ -176,6 +176,10 @@ var Commands = []cli.Command{
 				Name:  "swarm",
 				Usage: "Display the Swarm config instead of the Docker daemon",
 			},
+			cli.BoolFlag{
+				Name:  "swarm-master",
+				Usage: "Display the Swarm config for starting the Swarm manager",
+			},
 		},
 	},
 	{
@@ -348,7 +352,9 @@ func cmdConfig(c *cli.Context) {
 		log.Fatal(err)
 	}
 	dockerHost := cfg.machineUrl
-	if c.Bool("swarm") {
+	certPath := cfg.clientCertPath
+	keyPath := cfg.clientKeyPath
+	if c.Bool("swarm") || c.Bool("swarm-master") {
 		if !cfg.swarmMaster {
 			log.Fatalf("%s is not a swarm master", cfg.machineName)
 		}
@@ -368,9 +374,16 @@ func cmdConfig(c *cli.Context) {
 		machineIp := mParts[0]
 
 		dockerHost = fmt.Sprintf("tcp://%s:%s", machineIp, swarmPort)
+
+		// config to start a swarm manager
+		if c.Bool("swarm-master") {
+			certPath = filepath.Join(cfg.machineDir, "server.pem")
+			keyPath = filepath.Join(cfg.machineDir, "server-key.pem")
+		}
 	}
+
 	fmt.Printf("--tlsverify --tlscacert=%s --tlscert=%s --tlskey=%s -H=%s",
-		cfg.caCertPath, cfg.clientCertPath, cfg.clientKeyPath, dockerHost)
+		cfg.caCertPath, certPath, keyPath, dockerHost)
 }
 
 func cmdInspect(c *cli.Context) {

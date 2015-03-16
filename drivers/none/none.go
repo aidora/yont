@@ -2,6 +2,7 @@ package none
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/codegangsta/cli"
 	"github.com/docker/docker/api"
@@ -55,7 +56,8 @@ func (d *Driver) DriverName() string {
 }
 
 func (d *Driver) GetIP() (string, error) {
-	return "", nil
+	parts := strings.SplitN(d.URL, "://", 2)
+	return strings.SplitN(parts[1], ":", 2)[0], nil
 }
 
 func (d *Driver) GetMachineName() string {
