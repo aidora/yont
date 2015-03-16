@@ -411,6 +411,8 @@ func (h *Host) ConfigureAuth() error {
 		return err
 	}
 
+	// todo check if docker already running
+	h.StopDocker()
 	cmd, err = h.GetSSHCommand(fmt.Sprintf("echo \"%s\" | sudo tee -a %s", cfg.EngineConfig, cfg.EngineConfigPath))
 	if err != nil {
 		return err
@@ -459,6 +461,13 @@ CACERT=%s
 SERVERCERT=%s
 SERVERKEY=%s
 DOCKER_TLS=no`, opts, caCertPath, serverKeyPath, serverCertPath)
+	case "openstack":
+		// hack for Fedora only
+		daemonOpts = fmt.Sprintf("--host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:%d --selinux-enabled", dockerPort)
+		daemonOptsCfg = "/etc/sysconfig/docker"
+		opts := fmt.Sprintf("%s %s", defaultDaemonOpts, daemonOpts)
+		daemonCfg = fmt.Sprintf("OPTIONS=\\\"%s\\\"", opts)
+
 	default:
 		daemonOpts = fmt.Sprintf("--host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:%d", dockerPort)
 		daemonOptsCfg = "/etc/default/docker"

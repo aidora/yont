@@ -50,6 +50,7 @@ type Driver struct {
 	SwarmMaster      bool
 	SwarmHost        string
 	SwarmDiscovery   string
+	SSHDelay         int
 	client           Client
 }
 
@@ -179,6 +180,11 @@ func GetCreateFlags() []cli.Flag {
 			Usage: "OpenStack SSH port",
 			Value: 22,
 		},
+		cli.IntFlag{
+			Name:  "openstack-ssh-delay",
+			Usage: "Delay in seconds before connecting via SSH",
+			Value: 0,
+		},
 	}
 }
 
@@ -271,6 +277,8 @@ func (d *Driver) SetConfigFromFlags(flags drivers.DriverOptions) error {
 	d.SwarmMaster = flags.Bool("swarm-master")
 	d.SwarmHost = flags.String("swarm-host")
 	d.SwarmDiscovery = flags.String("swarm-discovery")
+
+	d.SSHDelay = flags.Int("openstack-ssh-delay")
 
 	return d.checkConfig()
 }
@@ -709,6 +717,10 @@ func (d *Driver) waitForSSHServer() error {
 	if err != nil {
 		return err
 	}
+
+	log.Debugf("Waiting %d second(s) for SSH key to be in-placed", d.SSHDelay)
+	time.Sleep(time.Duration(d.SSHDelay) * time.Second)
+
 	log.WithFields(log.Fields{
 		"MachineId": d.MachineId,
 		"IP":        ip,
