@@ -50,6 +50,7 @@ type Host struct {
 	SwarmHost      string
 	SwarmDiscovery string
 	storePath      string
+	arch           string
 }
 
 type DockerConfig struct {
@@ -436,6 +437,7 @@ func (h *Host) generateDockerConfig(dockerPort int, caCertPath string, serverKey
 	)
 
 	swarmLabels = append(swarmLabels, fmt.Sprintf("--label=provider=%s", h.Driver.DriverName()))
+	swarmLabels = append(swarmLabels, fmt.Sprintf("--label=arch=%s"), h.arch)
 
 	defaultDaemonOpts := fmt.Sprintf(`--tlsverify --tlscacert=%s --tlskey=%s --tlscert=%s %s`,
 		caCertPath,

@@ -138,6 +138,11 @@ var Commands = []cli.Command{
 				),
 				Value: "none",
 			},
+			cli.StringFlag{
+				Name:  "arch",
+				Usage: "Node architecture (amd64, 386, arm)",
+				Value: "amd64",
+			},
 			cli.BoolFlag{
 				Name:  "swarm",
 				Usage: "Configure Machine with Swarm",
