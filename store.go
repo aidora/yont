@@ -39,6 +39,8 @@ func (s *Store) Create(name string, driverName string, flags drivers.DriverOptio
 	hostPath := filepath.Join(s.Path, name)
 
 	host, err := NewHost(name, driverName, hostPath, s.CaCertPath, s.PrivateKeyPath, flags.Bool("swarm-master"), flags.String("swarm-host"), flags.String("swarm-discovery"))
+	// architecture identifier
+	host.arch = flags.String("arch")
 	if err != nil {
 		return host, err
 	}
