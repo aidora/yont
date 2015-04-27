@@ -14,7 +14,8 @@ import (
 // connect to existing Docker hosts by specifying the URL of the host as
 // an option.
 type Driver struct {
-	URL string
+	URL         string
+	MachineName string
 }
 
 func init() {
@@ -35,7 +36,7 @@ func GetCreateFlags() []cli.Flag {
 }
 
 func NewDriver(machineName string, storePath string, caCert string, privateKey string) (drivers.Driver, error) {
-	return &Driver{}, nil
+	return &Driver{MachineName: machineName}, nil
 }
 
 func (d *Driver) AuthorizePort(ports []*drivers.Port) error {
@@ -54,12 +55,12 @@ func (d *Driver) DriverName() string {
 	return "none"
 }
 
-func (d *Driver) GetIP() (string, error) {
+func (d *Driver) _GetIP() (string, error) {
 	return "", nil
 }
 
 func (d *Driver) GetMachineName() string {
-	return ""
+	return d.MachineName
 }
 
 func (d *Driver) GetSSHHostname() (string, error) {

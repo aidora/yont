@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"net/url"
+	"path/filepath"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -11,7 +12,17 @@ import (
 	"github.com/docker/machine/utils"
 )
 
-func _cmdConfig(c *cli.Context) {
+func cmdConfig(c *cli.Context) {
+	if c.Bool("swarm-master") {
+		cmdConfig0(c)
+		return
+	}
+
+	// original config, triggered when flag swarm-master == false
+	_cmdConfig(c)
+}
+
+func cmdConfig0(c *cli.Context) {
 	cfg, err := getMachineConfig(c)
 	if err != nil {
 		log.Fatal(err)
@@ -22,7 +33,10 @@ func _cmdConfig(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	if c.Bool("swarm") {
+	certPath := cfg.clientCertPath
+	keyPath := cfg.clientKeyPath
+
+	if c.Bool("swarm") || c.Bool("swarm-master") {
 		if !cfg.SwarmOptions.Master {
 			log.Fatalf("%s is not a swarm master", cfg.machineName)
 		}
@@ -42,6 +56,13 @@ func _cmdConfig(c *cli.Context) {
 		machineIp := mParts[0]
 
 		dockerHost = fmt.Sprintf("tcp://%s:%s", machineIp, swarmPort)
+
+		// config for starting as a swarm master
+		if c.Bool("swarm-master") {
+			certPath = filepath.Join(cfg.machineDir, "server.pem")
+			keyPath = filepath.Join(cfg.machineDir, "server-key.pem")
+		}
+
 	}
 
 	log.Debug(dockerHost)
@@ -52,6 +73,7 @@ func _cmdConfig(c *cli.Context) {
 	}
 
 	if u.Scheme != "unix" && getHost(c).Driver.DriverName() != "none" {
+
 		// validate cert and regenerate if needed
 		valid, err := utils.ValidateCertificate(
 			u.Host,
@@ -73,5 +95,5 @@ func _cmdConfig(c *cli.Context) {
 	}
 
 	fmt.Printf("--tlsverify --tlscacert=%q --tlscert=%q --tlskey=%q -H=%s",
-		cfg.caCertPath, cfg.clientCertPath, cfg.clientKeyPath, dockerHost)
+		cfg.caCertPath, certPath, keyPath, dockerHost)
 }

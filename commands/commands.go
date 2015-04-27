@@ -208,6 +208,10 @@ var Commands = []cli.Command{
 				Name:  "swarm",
 				Usage: "Display the Swarm config instead of the Docker daemon",
 			},
+			cli.BoolFlag{
+				Name:  "swarm-master",
+				Usage: "Display the Swarm config for starting Swarm Master",
+			},
 		},
 	},
 	{

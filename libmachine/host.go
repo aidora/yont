@@ -123,6 +123,13 @@ func (h *Host) Create(name string) error {
 		}
 	}
 
+	// nono driver hack
+	if h.Driver.DriverName() == "none" {
+		if err := provision.ConfigureAuthForNone(h.Driver, *h.HostOptions.AuthOptions); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
