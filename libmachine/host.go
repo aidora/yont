@@ -358,20 +358,28 @@ func sshAvailableFunc(h *Host) func() bool {
 			log.Debugf("Error getting IP address waiting for SSH: %s", err)
 			return false
 		}
+		log.Debugf(".. Got hostname: %s", hostname)
+
 		port, err := h.Driver.GetSSHPort()
 		if err != nil {
 			log.Debugf("Error getting SSH port: %s", err)
 			return false
 		}
+		log.Debugf(".. Got port: %d", port)
+
+		log.Debug("Waiting for TCP")
 		if err := ssh.WaitForTCP(fmt.Sprintf("%s:%d", hostname, port)); err != nil {
 			log.Debugf("Error waiting for TCP waiting for SSH: %s", err)
 			return false
 		}
 
+		log.Debug("Trying to run exit 0")
 		if _, err := h.RunSSHCommand("exit 0"); err != nil {
 			log.Debugf("Error getting ssh command 'exit 0' : %s", err)
 			return false
 		}
+
+		log.Debug("All seems to be OK")
 		return true
 	}
 }
